@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>동덕여대 학습관리 시스템</title>
+  <style>
+    :root {
+      --ddwu-wine: #8b1e3f;
+      --ddwu-wine-dark: #6d1730;
+      --ddwu-wine-light: #b5476a;
+      --ddwu-gold: #c9a25b;
+      --bg: #f4eef0;
+      --card-bg: #ffffff;
+      --text: #2b2226;
+      --text-muted: #877b80;
+      --border: #ece3e6;
+      --green: #3f9d6a;
+      --amber: #d99a2b;
+      --red: #cc4b4b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ===== 헤더 ===== */
+    header {
+      background: linear-gradient(135deg, var(--ddwu-wine) 0%, var(--ddwu-wine-dark) 100%);
+      color: #fff;
+      padding: 20px 0;
+      box-shadow: 0 2px 12px rgba(139, 30, 63, 0.25);
+    }
+    .header-inner {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-logo {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: #fff; color: var(--ddwu-wine);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 18px;
+      border: 2px solid var(--ddwu-gold);
+    }
+    .brand-title { font-size: 20px; font-weight: 700; }
+    .brand-sub { font-size: 12px; opacity: 0.85; letter-spacing: 0.5px; }
+    .user-box { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .user-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--ddwu-gold);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff;
+    }
+
+    /* ===== 컨테이너 ===== */
+    .container { max-width: 1220px; margin: 0 auto; padding: 28px 24px 60px; }
+    .page-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: var(--ddwu-wine-dark); }
+    .page-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+
+    /* ===== 벤토 그리드 ===== */
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: minmax(10px, auto);
+      gap: 18px;
+    }
+    /* 컬럼 스팬 유틸 */
+    .c3 { grid-column: span 3; }
+    .c4 { grid-column: span 4; }
+    .c5 { grid-column: span 5; }
+    .c6 { grid-column: span 6; }
+    .c7 { grid-column: span 7; }
+    .c8 { grid-column: span 8; }
+    .c12 { grid-column: span 12; }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.035);
+      padding: 20px 22px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(139, 30, 63, 0.12);
+    }
+
+    /* ===== 통계 카드 ===== */
+    .stat-card { flex-direction: row; align-items: center; gap: 16px; }
+    .stat-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .stat-icon.wine { background: rgba(139,30,63,0.1); }
+    .stat-icon.gold { background: rgba(201,162,91,0.16); }
+    .stat-icon.green { background: rgba(63,157,106,0.12); }
+    .stat-label { font-size: 13px; color: var(--text-muted); }
+    .stat-value { font-size: 26px; font-weight: 800; color: var(--ddwu-wine-dark); }
+    .stat-value small { font-size: 14px; font-weight: 600; color: var(--text-muted); }
+
+    /* ===== 카드 헤더 ===== */
+    .card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .card-head h2 {
+      font-size: 16px; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      color: var(--ddwu-wine-dark);
+    }
+    .badge {
+      font-size: 12px; color: var(--ddwu-wine);
+      background: rgba(139,30,63,0.08);
+      padding: 4px 10px; border-radius: 999px; font-weight: 600;
+    }
+
+    /* ===== 출결 ===== */
+    .att-donut-wrap { display: flex; align-items: center; gap: 20px; margin-bottom: 8px; }
+    .donut {
+      width: 118px; height: 118px; border-radius: 50%;
+      background: conic-gradient(var(--ddwu-wine) 0% 94%, var(--border) 94% 100%);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .donut::before {
+      content: ""; position: absolute;
+    }
+    .donut-inner {
+      width: 84px; height: 84px; border-radius: 50%;
+      background: var(--card-bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .donut-inner .p { font-size: 24px; font-weight: 800; color: var(--ddwu-wine); }
+    .donut-inner .l { font-size: 11px; color: var(--text-muted); }
+    .att-chips { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .att-chip {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; border-radius: 10px; background: var(--bg); font-size: 13px;
+    }
+    .att-chip .n { font-weight: 800; }
+    .att-chip.present .n { color: var(--green); }
+    .att-chip.late .n { color: var(--amber); }
+    .att-chip.absent .n { color: var(--red); }
+
+    /* ===== 강조 GPA 카드 ===== */
+    .highlight {
+      background: linear-gradient(140deg, var(--ddwu-wine) 0%, var(--ddwu-wine-dark) 100%);
+      color: #fff; justify-content: center; align-items: center; text-align: center;
+      border: none;
+    }
+    .highlight .big { font-size: 42px; font-weight: 800; line-height: 1.1; }
+    .highlight .big small { font-size: 18px; opacity: 0.8; font-weight: 600; }
+    .highlight .cap { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+    .highlight .rank {
+      margin-top: 12px; font-size: 12px;
+      background: rgba(255,255,255,0.18); padding: 5px 12px; border-radius: 999px;
+    }
+
+    /* ===== 진행바 ===== */
+    .progress {
+      height: 9px; background: var(--border); border-radius: 999px;
+      overflow: hidden; margin-top: 6px;
+    }
+    .progress > span {
+      display: block; height: 100%;
+      background: linear-gradient(90deg, var(--ddwu-wine-light), var(--ddwu-wine));
+      border-radius: 999px;
+    }
+    .assign-item { margin-bottom: 15px; }
+    .assign-item:last-child { margin-bottom: 0; }
+    .assign-top {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 14px; margin-bottom: 5px; gap: 10px;
+    }
+    .assign-top .due { color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+
+    /* ===== 테이블 ===== */
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th {
+      text-align: left; font-size: 12px; color: var(--text-muted); font-weight: 600;
+      padding: 8px 10px; border-bottom: 1px solid var(--border);
+    }
+    tbody td { padding: 10px; border-bottom: 1px solid var(--border); }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #faf6f7; }
+
+    .tag {
+      display: inline-block; font-size: 12px; font-weight: 600;
+      padding: 3px 10px; border-radius: 999px;
+    }
+    .tag.done { background: rgba(63,157,106,0.12); color: var(--green); }
+    .tag.ing  { background: rgba(217,154,43,0.14); color: var(--amber); }
+    .tag.wait { background: rgba(204,75,75,0.12); color: var(--red); }
+    .grade-pill { font-weight: 800; color: var(--ddwu-wine); }
+
+    footer {
+      text-align: center; color: var(--text-muted); font-size: 13px;
+      padding: 28px 20px 40px;
+    }
+
+    /* ===== 반응형 ===== */
+    @media (max-width: 1000px) {
+      .c3, .c4, .c5 { grid-column: span 6; }
+      .c7, .c8 { grid-column: span 12; }
+    }
+    @media (max-width: 620px) {
+      .bento { grid-template-columns: 1fr; }
+      .c3, .c4, .c5, .c6, .c7, .c8, .c12 { grid-column: span 1; }
+      .att-donut-wrap { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-logo">동덕</div>
+        <div>
+          <div class="brand-title">동덕여자대학교 학습관리 시스템</div>
+          <div class="brand-sub">DONGDUK WOMEN'S UNIVERSITY · LMS</div>
+        </div>
+      </div>
+      <div class="user-box">
+        <div class="user-avatar">서</div>
+        <div>
+          <div style="font-weight:600;">서가영 님</div>
+          <div style="font-size:12px; opacity:0.85;">컴퓨터학과 · 2학년</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="page-title">나의 학습 대시보드</div>
+    <div class="page-desc">2026학년도 2학기 · 출결, 성적, 과제를 한 화면에서 확인하세요.</div>
+
+    <div class="bento">
+      <!-- 통계 카드 4개 -->
+      <div class="card stat-card c3">
+        <div class="stat-icon wine">📅</div>
+        <div><div class="stat-label">평균 출석률</div><div class="stat-value">94<small>%</small></div></div>
+      </div>
+      <div class="card stat-card c3">
+        <div class="stat-icon gold">🎓</div>
+        <div><div class="stat-label">전체 평점</div><div class="stat-value">4.1<small>/4.5</small></div></div>
+      </div>
+      <div class="card stat-card c3">
+        <div class="stat-icon green">📝</div>
+        <div><div class="stat-label">제출 과제</div><div class="stat-value">12<small>/15</small></div></div>
+      </div>
+      <div class="card stat-card c3">
+        <div class="stat-icon wine">📚</div>
+        <div><div class="stat-label">수강 과목</div><div class="stat-value">6<small>과목</small></div></div>
+      </div>
+
+      <!-- 출결 현황 (도넛 + 칩) -->
+      <div class="card c4">
+        <div class="card-head">
+          <h2>📅 출결 현황</h2>
+          <span class="badge">이번 학기</span>
+        </div>
+        <div class="att-donut-wrap">
+          <div class="donut"><div class="donut-inner"><div class="p">94%</div><div class="l">출석률</div></div></div>
+          <div class="att-chips">
+            <div class="att-chip present"><span>출석</span><span class="n">58</span></div>
+            <div class="att-chip late"><span>지각</span><span class="n">3</span></div>
+            <div class="att-chip absent"><span>결석</span><span class="n">1</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 성적표 -->
+      <div class="card c5">
+        <div class="card-head">
+          <h2>🎓 성적표</h2>
+          <span class="badge">2학기</span>
+        </div>
+        <table>
+          <thead><tr><th>과목</th><th>학점</th><th>중간</th><th>기말</th><th>성적</th></tr></thead>
+          <tbody>
+            <tr><td>웹프로그래밍</td><td>3</td><td>95</td><td>97</td><td><span class="grade-pill">A+</span></td></tr>
+            <tr><td>자료구조</td><td>3</td><td>88</td><td>90</td><td><span class="grade-pill">A0</span></td></tr>
+            <tr><td>데이터베이스</td><td>3</td><td>82</td><td>85</td><td><span class="grade-pill">B+</span></td></tr>
+            <tr><td>영어회화</td><td>2</td><td>90</td><td>91</td><td><span class="grade-pill">A0</span></td></tr>
+            <tr><td>자바프로그래밍</td><td>3</td><td>93</td><td>94</td><td><span class="grade-pill">A+</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 강조 GPA 카드 -->
+      <div class="card highlight c3">
+        <div class="big">4.1<small>/4.5</small></div>
+        <div class="cap">이번 학기 평점</div>
+        <div class="rank">🏆 학과 상위 8%</div>
+      </div>
+
+      <!-- 진행 중인 과제 -->
+      <div class="card c7">
+        <div class="card-head">
+          <h2>📝 진행 중인 과제</h2>
+          <span class="badge">3건</span>
+        </div>
+        <div class="assign-item">
+          <div class="assign-top"><span><b>웹프로그래밍</b> — 반응형 웹 페이지 제작</span><span class="due">D-2 · 08.14</span></div>
+          <div class="progress"><span style="width:80%;"></span></div>
+        </div>
+        <div class="assign-item">
+          <div class="assign-top"><span><b>자료구조</b> — 이진 탐색 트리 구현 보고서</span><span class="due">D-5 · 08.17</span></div>
+          <div class="progress"><span style="width:45%;"></span></div>
+        </div>
+        <div class="assign-item">
+          <div class="assign-top"><span><b>데이터베이스</b> — ERD 설계 과제</span><span class="due">D-9 · 08.21</span></div>
+          <div class="progress"><span style="width:15%;"></span></div>
+        </div>
+      </div>
+
+      <!-- 과목별 출결 -->
+      <div class="card c5">
+        <div class="card-head">
+          <h2>📊 과목별 출결</h2>
+          <span class="badge">출석률</span>
+        </div>
+        <table>
+          <thead><tr><th>과목</th><th>출석</th><th>지각</th><th>결석</th><th>상태</th></tr></thead>
+          <tbody>
+            <tr><td>웹프로그래밍</td><td>12</td><td>0</td><td>0</td><td><span class="tag done">양호</span></td></tr>
+            <tr><td>자료구조</td><td>11</td><td>1</td><td>0</td><td><span class="tag done">양호</span></td></tr>
+            <tr><td>데이터베이스</td><td>12</td><td>0</td><td>0</td><td><span class="tag done">양호</span></td></tr>
+            <tr><td>영어회화</td><td>10</td><td>1</td><td>1</td><td><span class="tag ing">주의</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 전체 과제 목록 -->
+      <div class="card c12">
+        <div class="card-head">
+          <h2>📋 전체 과제 목록</h2>
+          <span class="badge">제출 12 / 15</span>
+        </div>
+        <table>
+          <thead><tr><th>과제명</th><th>과목</th><th>마감일</th><th>상태</th></tr></thead>
+          <tbody>
+            <tr><td>HTML/CSS 기초 실습</td><td>웹프로그래밍</td><td>08.05</td><td><span class="tag done">제출완료</span></td></tr>
+            <tr><td>정렬 알고리즘 분석</td><td>자료구조</td><td>08.08</td><td><span class="tag done">제출완료</span></td></tr>
+            <tr><td>SQL 기초 쿼리 작성</td><td>데이터베이스</td><td>08.10</td><td><span class="tag done">제출완료</span></td></tr>
+            <tr><td>반응형 웹 페이지 제작</td><td>웹프로그래밍</td><td>08.14</td><td><span class="tag ing">진행중</span></td></tr>
+            <tr><td>이진 탐색 트리 구현 보고서</td><td>자료구조</td><td>08.17</td><td><span class="tag ing">진행중</span></td></tr>
+            <tr><td>ERD 설계 과제</td><td>데이터베이스</td><td>08.21</td><td><span class="tag wait">미시작</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 동덕여자대학교 학습관리 시스템 · Vibe Coding 실습 프로젝트
+  </footer>
+</body>
+</html>
