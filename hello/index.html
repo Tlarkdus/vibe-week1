@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hello ✨</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 반짝이는 별밭 (JS로 채움) -->
+  <div class="stars-layer" id="starsLayer" aria-hidden="true"></div>
+
+  <!-- 떠다니는 행성 -->
+  <div class="planet" aria-hidden="true"></div>
+
+  <!-- 별똥별이 그려지는 레이어 -->
+  <div class="shooting-layer" id="shootingLayer" aria-hidden="true"></div>
+
+  <main class="container">
+    <!-- 아날로그 시계 -->
+    <div class="analog-clock" id="analogClock" aria-hidden="true">
+      <div class="tick tick-12"></div>
+      <div class="tick tick-3"></div>
+      <div class="tick tick-6"></div>
+      <div class="tick tick-9"></div>
+      <div class="hand hour" id="hourHand"></div>
+      <div class="hand minute" id="minuteHand"></div>
+      <div class="hand second" id="secondHand"></div>
+      <div class="center-dot"></div>
+    </div>
+    <div class="clock" id="clock" aria-live="off">--:--:--</div>
+
+    <h1 id="greeting">안녕하세요 👋</h1>
+    <p class="subtitle" id="timeGreeting">반가워요!</p>
+
+    <section class="card">
+      <label for="nameInput">이름을 입력해 보세요</label>
+      <input id="nameInput" type="text" placeholder="예: 홍길동" autocomplete="off" />
+      <button id="greetBtn" type="button">🎉 인사하기</button>
+      <p id="output" class="output" aria-live="polite"></p>
+    </section>
+
+    <p class="counter" id="counter">아직 인사하지 않았어요</p>
+  </main>
+
+  <!-- 컨페티가 그려지는 레이어 -->
+  <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
