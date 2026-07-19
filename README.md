@@ -7,6 +7,16 @@
 
 ---
 
+## 🔗 라이브로 보기 (GitHub Pages)
+
+바로 클릭해서 실제 작동하는 화면을 확인할 수 있습니다.
+
+- 🏫 **[LMS 대시보드](https://tlarkdus.github.io/vibe-week1/)**
+- 📖 **[방명록](https://tlarkdus.github.io/vibe-week1/guestbook.html)** — 이름·한마디를 남기면 저장되는 방명록 (아기 드래곤 무리가 떠다녀요 🐉)
+- 👋 **[Hello 인사 페이지](https://tlarkdus.github.io/vibe-week1/hello/)**
+
+---
+
 ## 📂 구성
 
 | 폴더/파일 | 설명 | 바로 보기 |
