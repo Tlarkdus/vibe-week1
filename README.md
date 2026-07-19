@@ -14,6 +14,7 @@
 - 🏫 **[LMS 대시보드](https://tlarkdus.github.io/vibe-week1/)**
 - 📖 **[방명록](https://tlarkdus.github.io/vibe-week1/guestbook.html)** — 이름·한마디를 남기면 저장되는 방명록 (아기 드래곤 무리가 떠다녀요 🐉)
 - 👋 **[Hello 인사 페이지](https://tlarkdus.github.io/vibe-week1/hello/)**
+- 🐉 **[드래곤 길들이기 인물·관계도](https://tlarkdus.github.io/vibe-week1/dragons.html)** — 인물 관계도(하트 팝 효과)와 카드, 자작 SVG 초상·드래곤, 버크섬 밤 배경
 
 ---
 
@@ -24,6 +25,7 @@
 | [`index.html`](./index.html) | 학생의 출결·성적·과제를 한 화면에서 확인하는 **동덕여대 스타일 LMS 대시보드** (벤토 카드 그리드 + 도넛 차트) | 루트에서 실행 |
 | [`hello/`](./hello) | 이름을 입력하면 인사해 주는 **Hello 인사 페이지**. 아날로그 시계, 별밭·별똥별·컨페티 효과 포함 | `hello/index.html` |
 | [`guestbook.html`](./guestbook.html) | 이름과 한마디를 남기는 **방명록 페이지**. `localStorage`에 저장되어 새로고침해도 유지, 글 삭제 가능 | 루트에서 실행 |
+| [`dragons.html`](./dragons.html) | 영화 **드래곤 길들이기 인물·관계도**. 색선 관계도(연인 노드 하트 팝) + 인물 카드(펼침·최애 저장), 자작 SVG 초상·드래곤, 버크섬 밤 배경(오로라·별·바다) | 루트에서 실행 |
 
 > 실습이 진행되면서 페이지가 계속 추가됩니다.
 
