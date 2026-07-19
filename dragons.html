@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>드래곤 길들이기 · 인물 & 관계도 🐉</title>
+  <style>
+    :root {
+      --bg: #07080f;
+      --text: #eef0fb;
+      --muted: #9298c0;
+      --faint: #6b7099;
+      --accent: #a99bff;
+      --accent2: #6fe3d2;
+      --gold: #ffd8a8;
+      --danger: #ff8098;
+      --glass: rgba(255, 255, 255, 0.045);
+      --glass-strong: rgba(255, 255, 255, 0.07);
+      --stroke: rgba(255, 255, 255, 0.09);
+      --stroke-soft: rgba(255, 255, 255, 0.06);
+      --shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
+
+      /* 관계선 색상 */
+      --rel-family: #ffd479;
+      --rel-lover:  #ff6b8a;
+      --rel-rider:  #b28cff;
+      --rel-friend: #5ec8ff;
+      --rel-mentor: #7ee0b8;
+      --rel-enemy:  #ff8a3d;
+      --rel-crush:  #ff9ecb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Pretendard", "Segoe UI", "Malgun Gothic", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 56px 18px 90px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* 배경 오브 */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.5;
+      z-index: -1;
+      pointer-events: none;
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+    .orb.a { width: 460px; height: 460px; top: -140px; right: -120px;
+      background: radial-gradient(circle, #6a5cff, transparent 70%); }
+    .orb.b { width: 420px; height: 420px; bottom: -160px; left: -130px;
+      background: radial-gradient(circle, #1f8f86, transparent 70%); animation-delay: -6s; }
+    .orb.c { width: 300px; height: 300px; top: 40%; left: 55%;
+      background: radial-gradient(circle, #b06a4a, transparent 70%); opacity: 0.3; animation-delay: -11s; }
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, -34px) scale(1.08); }
+    }
+
+    /* ===== 버크섬 배경 씬 (밤하늘 + 섬 + 바다) ===== */
+    .scene-bg {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      z-index: -2; pointer-events: none; overflow: hidden;
+    }
+    .scene-bg svg { width: 100%; height: 100%; display: block; }
+    .star { animation: twinkle 4.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes twinkle { 0%, 100% { opacity: 0.22; } 50% { opacity: 1; } }
+    .wave { animation: waveDrift 15s ease-in-out infinite alternate; }
+    .wave.w2 { animation-duration: 19s; animation-direction: alternate-reverse; }
+    .wave.w3 { animation-duration: 24s; }
+    @keyframes waveDrift { from { transform: translateX(-22px); } to { transform: translateX(22px); } }
+    .aurora { animation: auroraPulse 13s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes auroraPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+
+    .wrap { max-width: 980px; margin: 0 auto; }
+
+    /* ===== 헤더 ===== */
+    header { text-align: center; margin-bottom: 40px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.26em; text-indent: 0.26em;
+      color: var(--accent2); background: var(--glass); border: 1px solid var(--stroke);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      padding: 7px 16px; border-radius: 999px; margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: clamp(2.1rem, 6vw, 3rem);
+      font-weight: 800; letter-spacing: -0.035em; line-height: 1.15;
+    }
+    .grad {
+      background: linear-gradient(110deg, var(--accent), var(--accent2) 42%, var(--gold));
+      background-size: 220% auto;
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      animation: shimmer 6s linear infinite;
+    }
+    @keyframes shimmer { to { background-position: 220% center; } }
+    header p { color: var(--muted); margin: 14px auto 0; max-width: 34rem; font-size: 0.99rem; }
+
+    .fav-count {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 18px; padding: 7px 16px;
+      background: var(--glass); border: 1px solid var(--stroke); border-radius: 999px;
+      font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums;
+    }
+    .fav-count b { color: var(--danger); font-weight: 800; }
+
+    /* ===== 공통 섹션 ===== */
+    .section-head {
+      display: flex; align-items: baseline; gap: 12px;
+      margin: 46px 4px 18px;
+    }
+    .section-head h2 {
+      font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em;
+    }
+    .section-head span { color: var(--faint); font-size: 0.82rem; }
+
+    /* ===== 관계도 ===== */
+    .map-card {
+      background: var(--glass); border: 1px solid var(--stroke);
+      backdrop-filter: blur(16px) saturate(120%); -webkit-backdrop-filter: blur(16px) saturate(120%);
+      box-shadow: var(--shadow); border-radius: 22px;
+      padding: 18px 16px 20px; position: relative; overflow: hidden;
+    }
+    .map-card::before {
+      content: ""; position: absolute; inset: 0 0 auto 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+      opacity: 0.7;
+    }
+    .map-scroll { width: 100%; overflow-x: auto; }
+    .rel-svg { width: 100%; min-width: 620px; height: auto; display: block; }
+
+    .rel-edge { transition: opacity 0.2s, stroke-width 0.2s; }
+    .rel-svg.focus .rel-edge:not(.hot) { opacity: 0.1; }
+    .rel-svg.focus .rel-node:not(.on) { opacity: 0.28; }
+    .rel-edge.hot { stroke-width: 4.5; }
+
+    /* 연인 엣지에 띠용 떠오르는 하트 */
+    .rel-heart {
+      font-size: 24px; text-anchor: middle; dominant-baseline: central;
+      opacity: 0; pointer-events: none;
+      transform-box: fill-box; transform-origin: center;
+      transform: scale(0);
+    }
+    .rel-heart.show { animation: heartPop 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) forwards; }
+    @keyframes heartPop {
+      0%   { opacity: 0; transform: scale(0) translateY(6px); }
+      55%  { opacity: 1; transform: scale(1.4) translateY(-5px); }
+      75%  { opacity: 1; transform: scale(0.92) translateY(1px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .rel-node { cursor: pointer; transition: opacity 0.2s; }
+    .rel-node .bg {
+      fill: rgba(20, 20, 38, 0.92); stroke: var(--stroke); stroke-width: 1.4;
+      transition: stroke 0.2s, filter 0.2s;
+    }
+    .rel-node:hover .bg, .rel-node.on .bg { stroke: var(--accent2); }
+    .rel-node .emoji { font-size: 26px; text-anchor: middle; dominant-baseline: central; }
+    .rel-node .label {
+      font-size: 13px; font-weight: 700; text-anchor: middle; fill: var(--text);
+      paint-order: stroke; stroke: #07080f; stroke-width: 3px; stroke-linejoin: round;
+    }
+
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      margin-top: 16px;
+    }
+    .legend .chip {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 0.8rem; color: var(--muted);
+      background: rgba(0, 0, 0, 0.22); border: 1px solid var(--stroke-soft);
+      padding: 5px 12px; border-radius: 999px;
+    }
+    .legend .swatch { width: 20px; height: 3px; border-radius: 2px; }
+    .legend .swatch.dash { background-image: repeating-linear-gradient(90deg, currentColor 0 5px, transparent 5px 9px); height: 3px; }
+    .map-hint { text-align: center; color: var(--faint); font-size: 0.78rem; margin-top: 12px; }
+
+    /* ===== 인물 카드 ===== */
+    .grid {
+      display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+    .card {
+      position: relative;
+      background: var(--glass); border: 1px solid var(--stroke);
+      backdrop-filter: blur(16px) saturate(120%); -webkit-backdrop-filter: blur(16px) saturate(120%);
+      box-shadow: var(--shadow); border-radius: 18px;
+      padding: 18px 18px 16px; cursor: pointer;
+      transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.16);
+      box-shadow: 0 26px 54px -22px rgba(0, 0, 0, 0.8);
+    }
+    .card-head { display: flex; align-items: center; gap: 13px; padding-right: 34px; }
+    .c-avatar {
+      width: 60px; height: 60px; border-radius: 16px; flex-shrink: 0; padding: 3px;
+      display: grid; place-items: center; overflow: hidden;
+      background: linear-gradient(150deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02));
+      border: 1px solid var(--stroke); box-shadow: inset 0 0 12px rgba(0,0,0,0.4);
+    }
+    .avatar-svg { width: 100%; height: 100%; display: block; }
+    .dg-eye { animation: blink 5s infinite; transform-origin: center; }
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      95%, 97%      { transform: scaleY(0.12); }
+    }
+    .c-name { font-weight: 800; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .c-role { color: var(--muted); font-size: 0.8rem; }
+
+    .c-dragon {
+      margin-top: 13px; font-size: 0.83rem; color: var(--accent2);
+      background: rgba(111, 227, 210, 0.08); border: 1px solid rgba(111, 227, 210, 0.18);
+      padding: 6px 11px; border-radius: 10px; display: inline-block;
+    }
+    .c-tags { margin-top: 11px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .c-tags span {
+      font-size: 0.74rem; color: var(--faint);
+      background: rgba(0, 0, 0, 0.22); border: 1px solid var(--stroke-soft);
+      padding: 3px 9px; border-radius: 999px;
+    }
+
+    .c-desc {
+      max-height: 0; opacity: 0; overflow: hidden;
+      color: #d9ddf6; font-size: 0.9rem;
+      transition: max-height 0.32s ease, opacity 0.28s ease, margin 0.28s ease;
+      border-left: 2px solid var(--stroke); padding-left: 0; margin-top: 0;
+    }
+    .card.open .c-desc {
+      max-height: 260px; opacity: 1; margin-top: 14px; padding-left: 13px;
+    }
+    .c-more {
+      margin-top: 12px; font-size: 0.78rem; color: var(--faint); font-weight: 600;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .c-more .arw { transition: transform 0.28s; }
+    .card.open .c-more .arw { transform: rotate(180deg); }
+
+    .fav {
+      position: absolute; top: 14px; right: 12px;
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid var(--stroke-soft); background: rgba(0, 0, 0, 0.25);
+      color: var(--faint); font-size: 1.05rem; cursor: pointer;
+      display: grid; place-items: center; line-height: 1;
+      transition: transform 0.12s, color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .fav:hover { transform: scale(1.12); border-color: rgba(255, 128, 152, 0.5); }
+    .fav:active { transform: scale(0.9); }
+    .fav.on { color: var(--danger); border-color: rgba(255, 128, 152, 0.55); background: rgba(255, 128, 152, 0.14); }
+
+    footer {
+      text-align: center; color: var(--faint); font-size: 0.78rem;
+      margin-top: 52px; letter-spacing: 0.02em; line-height: 1.8;
+    }
+    footer a { color: var(--muted); }
+
+    @media (max-width: 560px) {
+      body { padding-top: 40px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .orb, .grad, .card, .c-desc, .rel-edge, .rel-node, .fav, .c-more .arw, .dg-eye { animation: none; transition: none; }
+      .rel-heart.show { animation: none; opacity: 1; transform: scale(1); }
+      .star, .wave, .aurora { animation: none; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 버크섬 배경: 밤하늘 · 오로라 · 달 · 별 · 바위 첨탑 · 전나무 섬 · 바다 -->
+  <div class="scene-bg" aria-hidden="true">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#050f18"/>
+          <stop offset="42%" stop-color="#082230"/>
+          <stop offset="72%" stop-color="#0e3541"/>
+          <stop offset="100%" stop-color="#134450"/>
+        </linearGradient>
+        <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#123f4c"/>
+          <stop offset="55%" stop-color="#0a2833"/>
+          <stop offset="100%" stop-color="#04121a"/>
+        </linearGradient>
+        <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#bfe6dc" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#bfe6dc" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="auroraG" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#48c79a" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#48c79a" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="26"/>
+        </filter>
+      </defs>
+
+      <!-- 하늘 -->
+      <rect x="0" y="0" width="1440" height="900" fill="url(#sky)"/>
+
+      <!-- 오로라 -->
+      <ellipse class="aurora" cx="520" cy="210" rx="520" ry="120" fill="url(#auroraG)" filter="url(#soft)"/>
+      <ellipse class="aurora" cx="1080" cy="150" rx="360" ry="90" fill="url(#auroraG)" filter="url(#soft)" style="animation-delay:-5s"/>
+
+      <!-- 달 -->
+      <circle cx="1150" cy="170" r="120" fill="url(#moonGlow)"/>
+      <circle cx="1150" cy="170" r="52" fill="#e8f1f2"/>
+      <circle cx="1132" cy="158" r="9" fill="#d3e0e2" opacity="0.7"/>
+      <circle cx="1166" cy="184" r="6" fill="#d3e0e2" opacity="0.6"/>
+      <circle cx="1158" cy="150" r="5" fill="#d3e0e2" opacity="0.6"/>
+
+      <!-- 별 -->
+      <g fill="#eaf6ff">
+        <circle class="star" cx="120" cy="90" r="2"/>
+        <circle class="star" cx="240" cy="160" r="1.6" style="animation-delay:-1.2s"/>
+        <circle class="star" cx="360" cy="70" r="2.2" style="animation-delay:-2.4s"/>
+        <circle class="star" cx="520" cy="130" r="1.5" style="animation-delay:-0.6s"/>
+        <circle class="star" cx="640" cy="60" r="2" style="animation-delay:-3s"/>
+        <circle class="star" cx="760" cy="140" r="1.7" style="animation-delay:-1.8s"/>
+        <circle class="star" cx="900" cy="80" r="2.1" style="animation-delay:-2.1s"/>
+        <circle class="star" cx="1010" cy="150" r="1.5" style="animation-delay:-0.9s"/>
+        <circle class="star" cx="1320" cy="110" r="2" style="animation-delay:-2.7s"/>
+        <circle class="star" cx="1380" cy="230" r="1.6" style="animation-delay:-1.5s"/>
+        <circle class="star" cx="70" cy="240" r="1.7" style="animation-delay:-3.3s"/>
+        <circle class="star" cx="440" cy="240" r="1.5" style="animation-delay:-2.2s"/>
+      </g>
+
+      <!-- 먼 바위 첨탑 (버크 특유의 뾰족 바위) -->
+      <g fill="#071c24">
+        <path d="M250 585 L244 360 Q250 344 256 360 L266 585 Z"/>
+        <path d="M330 585 L326 430 Q330 418 334 430 L342 585 Z"/>
+        <path d="M1180 585 L1174 400 Q1180 386 1186 400 L1196 585 Z"/>
+      </g>
+
+      <!-- 섬 + 전나무 숲 -->
+      <g>
+        <path d="M360 600 C480 548 560 560 680 548 C800 536 900 556 1010 566 C1088 574 1110 585 1110 610 L1110 660 L360 660 Z" fill="#05141c"/>
+        <g fill="#08202a">
+          <!-- 전나무: translate로 배치, 3단 삼각형 + 밑동 -->
+          <g transform="translate(470,560) scale(0.9)"><rect x="-3" y="-6" width="6" height="12" fill="#06171d"/><path d="M0 -52 L14 -26 L7 -26 L18 -6 L9 -6 L20 10 L-20 10 L-9 -6 L-18 -6 L-7 -26 L-14 -26 Z"/></g>
+          <g transform="translate(545,556) scale(1.1)"><rect x="-3" y="-6" width="6" height="12" fill="#06171d"/><path d="M0 -52 L14 -26 L7 -26 L18 -6 L9 -6 L20 10 L-20 10 L-9 -6 L-18 -6 L-7 -26 L-14 -26 Z"/></g>
+          <g transform="translate(630,552) scale(0.95)"><rect x="-3" y="-6" width="6" height="12" fill="#06171d"/><path d="M0 -52 L14 -26 L7 -26 L18 -6 L9 -6 L20 10 L-20 10 L-9 -6 L-18 -6 L-7 -26 L-14 -26 Z"/></g>
+          <g transform="translate(720,556) scale(1.15)"><rect x="-3" y="-6" width="6" height="12" fill="#06171d"/><path d="M0 -52 L14 -26 L7 -26 L18 -6 L9 -6 L20 10 L-20 10 L-9 -6 L-18 -6 L-7 -26 L-14 -26 Z"/></g>
+          <g transform="translate(815,560) scale(0.9)"><rect x="-3" y="-6" width="6" height="12" fill="#06171d"/><path d="M0 -52 L14 -26 L7 -26 L18 -6 L9 -6 L20 10 L-20 10 L-9 -6 L-18 -6 L-7 -26 L-14 -26 Z"/></g>
+          <g transform="translate(900,566) scale(1.05)"><rect x="-3" y="-6" width="6" height="12" fill="#06171d"/><path d="M0 -52 L14 -26 L7 -26 L18 -6 L9 -6 L20 10 L-20 10 L-9 -6 L-18 -6 L-7 -26 L-14 -26 Z"/></g>
+          <g transform="translate(985,572) scale(0.85)"><rect x="-3" y="-6" width="6" height="12" fill="#06171d"/><path d="M0 -52 L14 -26 L7 -26 L18 -6 L9 -6 L20 10 L-20 10 L-9 -6 L-18 -6 L-7 -26 L-14 -26 Z"/></g>
+        </g>
+      </g>
+
+      <!-- 바다 (앞쪽 파도 3겹, 좌우로 은은히 드리프트) -->
+      <g fill="url(#sea)">
+        <path class="wave w1" d="M-140 610 C 180 590 360 628 620 606 C 880 584 1120 626 1580 604 L1580 920 L-140 920 Z"/>
+      </g>
+      <g fill="#0a2833">
+        <path class="wave w2" d="M-140 680 C 200 660 420 700 680 678 C 940 656 1180 696 1580 674 L1580 920 L-140 920 Z"/>
+      </g>
+      <g fill="#061620">
+        <path class="wave w3" d="M-140 760 C 220 742 460 780 720 760 C 980 740 1220 778 1580 758 L1580 920 L-140 920 Z"/>
+      </g>
+      <!-- 파도 물마루 하이라이트 -->
+      <g stroke="#7fd8cc" stroke-width="1.5" fill="none" opacity="0.12">
+        <path class="wave w1" d="M-140 610 C 180 590 360 628 620 606 C 880 584 1120 626 1580 604"/>
+        <path class="wave w2" d="M-140 680 C 200 660 420 700 680 678 C 940 656 1180 696 1580 674"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="orb a" aria-hidden="true"></div>
+  <div class="orb b" aria-hidden="true"></div>
+  <div class="orb c" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="badge">🐉 HOW TO TRAIN YOUR DRAGON</div>
+      <h1><span class="grad">드래곤 길들이기</span><br />인물 &amp; 관계도</h1>
+      <p>버크섬의 라이더와 드래곤, 그리고 그들을 둘러싼 사람들. 노드에 마우스를 올리면 관계선이 강조되고, 카드를 누르면 소개가 펼쳐집니다.</p>
+      <div class="fav-count">❤️ 내 최애 <b id="favN">0</b>명</div>
+    </header>
+
+    <!-- ===== 관계도 ===== -->
+    <div class="section-head">
+      <h2>관계도</h2>
+      <span>주요 인물 중심 · 노드 hover로 연결 강조</span>
+    </div>
+    <div class="map-card">
+      <div class="map-scroll">
+        <svg class="rel-svg" id="relSvg" viewBox="0 0 900 660" role="img" aria-label="드래곤 길들이기 주요 인물 관계도"></svg>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="map-hint">💡 노드를 클릭하면 강조가 고정됩니다. 빈 곳을 누르면 해제돼요.</div>
+    </div>
+
+    <!-- ===== 인물 카드 ===== -->
+    <div id="cards"></div>
+
+    <footer>
+      이모지와 직접 그린 SVG로만 표현한 팬 페이지 · 영화 스틸컷 미사용<br />
+      최애 하트는 이 브라우저(localStorage)에 저장되어 새로고침해도 유지됩니다.
+    </footer>
+  </div>
+
+  <script>
+    /* ===================== 데이터 ===================== */
+    // 관계도 노드 (주요 인물 중심)
+    const NODES = {
+      hiccup:    { x: 450, y: 300, emoji: "🗡️", name: "히컵" },
+      toothless: { x: 450, y: 450, emoji: "🖤", name: "투슬리스" },
+      lightfury: { x: 620, y: 505, emoji: "🤍", name: "라이트퓨어리" },
+      astrid:    { x: 630, y: 300, emoji: "🪓", name: "아스트리드" },
+      stoick:    { x: 300, y: 145, emoji: "🛡️", name: "스토이크" },
+      valka:     { x: 510, y: 120, emoji: "🌿", name: "발카" },
+      gobber:    { x: 165, y: 300, emoji: "🔨", name: "고버" },
+      fishlegs:  { x: 165, y: 470, emoji: "📚", name: "피시레그" },
+      snotlout:  { x: 300, y: 565, emoji: "😤", name: "스노트라웃" },
+      ruffnut:   { x: 470, y: 605, emoji: "💥", name: "러프넛" },
+      tuffnut:   { x: 625, y: 600, emoji: "🌀", name: "터프넛" },
+      drago:     { x: 800, y: 380, emoji: "⚔️", name: "드라고" },
+      grimmel:   { x: 805, y: 195, emoji: "🏹", name: "그리멜" },
+    };
+
+    // 관계선
+    const EDGES = [
+      // 가족
+      ["hiccup", "stoick", "family"], ["hiccup", "valka", "family"], ["stoick", "valka", "family"],
+      ["ruffnut", "tuffnut", "family"],
+      // 연인
+      ["hiccup", "astrid", "lover"], ["toothless", "lightfury", "lover"],
+      // 라이더-드래곤
+      ["hiccup", "toothless", "rider"],
+      // 친구 (6인방)
+      ["hiccup", "fishlegs", "friend"], ["hiccup", "snotlout", "friend"],
+      ["astrid", "ruffnut", "friend"], ["fishlegs", "snotlout", "friend"],
+      ["astrid", "fishlegs", "friend"],
+      // 스승-제자
+      ["hiccup", "gobber", "mentor"],
+      // 적대
+      ["hiccup", "drago", "enemy"], ["hiccup", "grimmel", "enemy"], ["toothless", "grimmel", "enemy"],
+      // 짝사랑
+      ["snotlout", "ruffnut", "crush"],
+    ];
+
+    // 관계 유형 메타 (색/점선/범례)
+    const REL = {
+      family: { color: "var(--rel-family)", dash: "",      label: "💛 가족" },
+      lover:  { color: "var(--rel-lover)",  dash: "",      label: "❤️ 연인" },
+      rider:  { color: "var(--rel-rider)",  dash: "",      label: "🖤 라이더–드래곤" },
+      friend: { color: "var(--rel-friend)", dash: "",      label: "💙 친구" },
+      mentor: { color: "var(--rel-mentor)", dash: "",      label: "💚 스승–제자" },
+      enemy:  { color: "var(--rel-enemy)",  dash: "9 7",   label: "🔥 적대" },
+      crush:  { color: "var(--rel-crush)",  dash: "6 6",   label: "😅 짝사랑" },
+    };
+
+    // 인물 카드 (전원)
+    const GROUPS = [
+      { key: "rider",   label: "라이더 6인방", sub: "버크섬의 젊은 드래곤 라이더들" },
+      { key: "adult",   label: "어른 · 멘토",  sub: "히컵을 이끄는 어른들" },
+      { key: "dragon",  label: "특별한 드래곤", sub: "이야기의 중심에 선 드래곤" },
+      { key: "villain", label: "빌런",         sub: "버크와 드래곤을 위협하는 자들" },
+    ];
+
+    const CHARACTERS = [
+      // 라이더
+      { id: "hiccup", group: "rider", emoji: "🗡️", name: "히컵", role: "버크섬의 젊은 족장",
+        dragon: "🐉 투슬리스 · 나이트 퓨어리",
+        desc: "겁 많고 서툴던 소년에서, 드래곤과 인간이 공존하는 버크섬을 이끄는 젊은 족장으로 성장한다. 잃은 다리를 대신하는 의족과 파이어 소드가 상징.",
+        tags: ["주인공", "족장", "발명가"] },
+      { id: "astrid", group: "rider", emoji: "🪓", name: "아스트리드", role: "마을 최고의 전사",
+        dragon: "🐉 폭풍꼬리 · 데들리 네이더",
+        desc: "냉철하고 용감한 마을 최고의 전사이자 히컵의 든든한 동료이자 연인. 도끼를 자유자재로 다룬다.",
+        tags: ["전사", "연인", "리더"] },
+      { id: "snotlout", group: "rider", emoji: "😤", name: "스노트라웃", role: "허세 가득한 사촌",
+        dragon: "🐉 훅팽 · 몬스트러스 나이트메어",
+        desc: "허세는 가득하지만 정 많은 히컵의 사촌. 불같은 성격의 훅팽과 티격태격하며 함께 성장한다. 러프넛을 향한 짝사랑은 덤.",
+        tags: ["허세", "사촌", "짝사랑"] },
+      { id: "fishlegs", group: "rider", emoji: "📚", name: "피시레그", role: "드래곤 지식파",
+        dragon: "🐉 미트럭 · 그롱클",
+        desc: "드래곤 백과사전을 통째로 외우는 지식파. 겁은 많지만 다정하며, 온순한 그롱클 미트럭과 짝을 이룬다.",
+        tags: ["지식파", "다정"] },
+      { id: "ruffnut", group: "rider", emoji: "💥", name: "러프넛", role: "말썽꾸러기 쌍둥이 누나",
+        dragon: "🐉 바프&벨치 · 히디어스 지플백 (공유)",
+        desc: "터프넛과 늘 붙어 다니는 말썽꾸러기 쌍둥이 누나. 혼돈과 장난을 즐기며, 남매가 머리 둘 달린 지플백을 함께 탄다.",
+        tags: ["쌍둥이", "말썽꾸러기"] },
+      { id: "tuffnut", group: "rider", emoji: "🌀", name: "터프넛", role: "엉뚱한 쌍둥이 동생",
+        dragon: "🐉 바프&벨치 · 히디어스 지플백 (공유)",
+        desc: "러프넛의 쌍둥이 동생. 엉뚱하고 능청스러우며, 누나와 함께 히디어스 지플백 바프&벨치를 조종한다.",
+        tags: ["쌍둥이", "엉뚱"] },
+      // 어른
+      { id: "stoick", group: "adult", emoji: "🛡️", name: "스토이크", role: "히컵의 아버지 · 전 족장",
+        dragon: "🐉 스컬크러셔 · 럼블혼",
+        desc: "히컵의 아버지이자 버크섬의 전 족장. 우직하고 강인한 전사로, 겉은 무뚝뚝해도 아들을 깊이 사랑한다.",
+        tags: ["아버지", "전 족장"] },
+      { id: "valka", group: "adult", emoji: "🌿", name: "발카", role: "드래곤 수호자 · 히컵의 어머니",
+        dragon: "🐉 클라우드점퍼 · 스톰커터",
+        desc: "20년간 실종되었던 히컵의 어머니. 드래곤들의 수호자로 살아오며, 누구보다 드래곤을 깊이 이해한다.",
+        tags: ["어머니", "드래곤 수호자"] },
+      { id: "gobber", group: "adult", emoji: "🔨", name: "고버", role: "대장장이 · 히컵의 스승",
+        dragon: "🐉 그럼프 · 홋버플",
+        desc: "마을의 대장장이이자 히컵의 스승. 한 팔과 한 다리를 잃었지만 유쾌함을 잃지 않는 든든한 조력자.",
+        tags: ["대장장이", "스승"] },
+      // 드래곤
+      { id: "toothless", group: "dragon", emoji: "🖤", name: "투슬리스", role: "나이트 퓨어리 · 드래곤 알파",
+        dragon: "🤍 짝 · 라이트퓨어리",
+        desc: "히컵의 단짝 나이트 퓨어리. 영리하고 장난기 많으며, 꼬리 보조날개가 없으면 혼자 날 수 없다. 훗날 모든 드래곤의 '알파'가 된다.",
+        tags: ["나이트 퓨어리", "단짝", "알파"] },
+      { id: "lightfury", group: "dragon", emoji: "🤍", name: "라이트퓨어리", role: "투슬리스의 짝 · 야생 드래곤",
+        dragon: "🖤 짝 · 투슬리스",
+        desc: "3편에서 등장한 투슬리스의 짝. 새하얀 비늘과 몸을 감추는 은신 능력을 지닌 자유로운 야생의 드래곤.",
+        tags: ["야생", "은신", "연인"] },
+      // 빌런
+      { id: "drago", group: "villain", emoji: "⚔️", name: "드라고 블러드피스트", role: "2편의 빌런 · 정복자",
+        dragon: "🐲 거대 버윌더비스트를 부림",
+        desc: "드래곤을 힘으로 굴복시켜 군대를 만들려는 정복자. 거대한 알파 버윌더비스트를 앞세워 세상을 위협한다.",
+        tags: ["빌런", "정복자", "2편"] },
+      { id: "grimmel", group: "villain", emoji: "🏹", name: "그리멜", role: "3편의 빌런 · 드래곤 사냥꾼",
+        dragon: "🐲 데스그리퍼 군단을 부림",
+        desc: "나이트 퓨어리를 멸종으로 몰아넣은 냉혹한 드래곤 사냥꾼. 독을 다루는 데스그리퍼들을 앞세워 투슬리스를 노린다.",
+        tags: ["빌런", "사냥꾼", "3편"] },
+      { id: "alvin", group: "villain", emoji: "⚓", name: "앨빈", role: "초기 시리즈의 적",
+        dragon: "⚓ 아웃캐스트 부족의 두목",
+        desc: "버크를 위협하는 아웃캐스트 부족의 두목. 초기 시리즈에서 히컵과 대립하는 거친 적대자.",
+        tags: ["빌런", "아웃캐스트", "초기"] },
+    ];
+
+    /* ---------- 아바타 데이터 (관계도·카드 공용) ---------- */
+    // 실제 드래곤만 드래곤 그림, 나머지 사람은 바이킹 초상
+    const DRAGONS = new Set(["toothless", "lightfury"]);
+
+    const DRAGON_ART = {
+      toothless: { body: ["#2c2c48", "#151528", "#08080f"], eye: ["#d6fff4", "#59e3cf", "#1f9f8f"], horn: "ears" },
+      lightfury: { body: ["#f2f5ff", "#cfd6ec", "#9aa4c4"], eye: ["#f0e6ff", "#b28cff", "#6a3fd0"], horn: "ears", dark: true },
+    };
+
+    // 사람 캐릭터: 바이킹 초상 (피부/머리색·헤어스타일·수염·투구로 구분)
+    const HUMAN_ART = {
+      hiccup:   { skin: "#e8b892", cloth: "#3f5d3a", hair: { c: "#6f4423", style: "messy" }, beard: "none" },
+      astrid:   { skin: "#f2c89c", cloth: "#7a6144", hair: { c: "#e6c352", style: "sideBraid" }, beard: "none" },
+      snotlout: { skin: "#d59a68", cloth: "#5a2f2a", hair: { c: "#241d16", style: "none" }, beard: "none", helmet: "#5a4a2e", fierce: true },
+      fishlegs: { skin: "#f0c8a0", cloth: "#6a6a48", hair: { c: "#e0c877", style: "short" }, beard: "none" },
+      ruffnut:  { skin: "#efc79a", cloth: "#5f5a44", hair: { c: "#ddb85a", style: "twinBraids" }, beard: "none" },
+      tuffnut:  { skin: "#e6bd8f", cloth: "#5a5540", hair: { c: "#cfaa55", style: "dreads" }, beard: "none" },
+      stoick:   { skin: "#d59a68", cloth: "#4a3a2a", hair: { c: "#b23a1a", style: "none" }, beard: "full", beardC: "#b23a1a", helmet: "#6a5030" },
+      valka:    { skin: "#e8b892", cloth: "#48483a", hair: { c: "#8a7a68", style: "longLoose" }, beard: "none", paint: "#6fa0c0" },
+      gobber:   { skin: "#e0a878", cloth: "#5a4a3a", hair: { c: "#d0a84a", style: "baldTuft" }, beard: "mustache", beardC: "#d0a84a" },
+      drago:    { skin: "#8a6a52", cloth: "#241d18", hair: { c: "#1a1512", style: "dreads" }, beard: "full", beardC: "#1a1512", fierce: true, scar: "#7a3028" },
+      grimmel:  { skin: "#d6ccb2", cloth: "#3a3f3a", hair: { c: "#a8a8a8", style: "sideThin" }, beard: "none", fierce: true },
+      alvin:    { skin: "#c58a58", cloth: "#3a2f28", hair: { c: "#241d16", style: "longLoose" }, beard: "full", beardC: "#241d16", fierce: true },
+    };
+
+    /* ===================== 관계도 렌더 ===================== */
+    const SVGNS = "http://www.w3.org/2000/svg";
+    const svg = document.getElementById("relSvg");
+
+    // 노드별 연결 이웃 계산 (hover 강조용)
+    const NEIGHBORS = {};
+    Object.keys(NODES).forEach((k) => (NEIGHBORS[k] = new Set([k])));
+
+    // 관계선 먼저 그리기 (노드 아래에 깔림)
+    EDGES.forEach(([a, b, type], i) => {
+      const na = NODES[a], nb = NODES[b], meta = REL[type];
+      const line = document.createElementNS(SVGNS, "line");
+      line.setAttribute("x1", na.x); line.setAttribute("y1", na.y);
+      line.setAttribute("x2", nb.x); line.setAttribute("y2", nb.y);
+      line.setAttribute("stroke", meta.color);
+      line.setAttribute("stroke-width", "2.6");
+      line.setAttribute("stroke-linecap", "round");
+      if (meta.dash) line.setAttribute("stroke-dasharray", meta.dash);
+      line.setAttribute("class", "rel-edge");
+      line.dataset.a = a; line.dataset.b = b; line.dataset.idx = i;
+      svg.appendChild(line);
+      NEIGHBORS[a].add(b); NEIGHBORS[b].add(a);
+    });
+
+    // 노드 그리기
+    Object.entries(NODES).forEach(([id, n]) => {
+      const g = document.createElementNS(SVGNS, "g");
+      g.setAttribute("class", "rel-node");
+      g.dataset.id = id;
+
+      const bg = document.createElementNS(SVGNS, "circle");
+      bg.setAttribute("cx", n.x); bg.setAttribute("cy", n.y); bg.setAttribute("r", 30);
+      bg.setAttribute("class", "bg");
+      g.appendChild(bg);
+
+      // 아바타(사람 초상 / 드래곤)를 원형으로 클립해 노드 안에 삽입
+      g.insertAdjacentHTML("beforeend", `
+        <clipPath id="clip_${id}"><circle cx="${n.x}" cy="${n.y}" r="27"/></clipPath>
+        <g clip-path="url(#clip_${id})">
+          <svg x="${n.x - 30}" y="${n.y - 30}" width="60" height="60" viewBox="0 0 120 120">${avatarInner(id, id + "_m")}</svg>
+        </g>`);
+
+      const tx = document.createElementNS(SVGNS, "text");
+      tx.setAttribute("x", n.x); tx.setAttribute("y", n.y + 48);
+      tx.setAttribute("class", "label");
+      tx.textContent = n.name;
+      g.appendChild(tx);
+
+      svg.appendChild(g);
+    });
+
+    // 연인 엣지 중앙에 하트 (평소 숨김 → 연인 노드 hover 시 띠용)
+    EDGES.forEach(([a, b, type]) => {
+      if (type !== "lover") return;
+      const na = NODES[a], nb = NODES[b];
+      const heart = document.createElementNS(SVGNS, "text");
+      heart.setAttribute("x", (na.x + nb.x) / 2);
+      heart.setAttribute("y", (na.y + nb.y) / 2);
+      heart.setAttribute("class", "rel-heart");
+      heart.dataset.a = a; heart.dataset.b = b;
+      heart.textContent = "❤️";
+      svg.appendChild(heart);
+    });
+
+    // hover / 클릭 강조
+    let locked = null;
+
+    function highlight(id) {
+      svg.classList.add("focus");
+      const near = NEIGHBORS[id];
+      svg.querySelectorAll(".rel-node").forEach((el) => {
+        el.classList.toggle("on", near.has(el.dataset.id));
+      });
+      svg.querySelectorAll(".rel-edge").forEach((el) => {
+        el.classList.toggle("hot", el.dataset.a === id || el.dataset.b === id);
+      });
+      // 이 노드에 연결된 연인 엣지의 하트를 띠용
+      svg.querySelectorAll(".rel-heart").forEach((el) => {
+        el.classList.toggle("show", el.dataset.a === id || el.dataset.b === id);
+      });
+    }
+    function clearHighlight() {
+      svg.classList.remove("focus");
+      svg.querySelectorAll(".on").forEach((el) => el.classList.remove("on"));
+      svg.querySelectorAll(".hot").forEach((el) => el.classList.remove("hot"));
+      svg.querySelectorAll(".rel-heart.show").forEach((el) => el.classList.remove("show"));
+    }
+
+    svg.querySelectorAll(".rel-node").forEach((node) => {
+      const id = node.dataset.id;
+      node.addEventListener("mouseenter", () => { if (!locked) highlight(id); });
+      node.addEventListener("mouseleave", () => { if (!locked) clearHighlight(); });
+      node.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (locked === id) { locked = null; clearHighlight(); }
+        else { locked = id; highlight(id); }
+      });
+    });
+    document.addEventListener("click", () => { if (locked) { locked = null; clearHighlight(); } });
+
+    // 범례 (이모지 + 색 스와치 + 관계명)
+    const legend = document.getElementById("legend");
+    Object.values(REL).forEach((meta) => {
+      const [emoji, ...rest] = meta.label.split(" ");
+      const sw = `<span class="swatch${meta.dash ? " dash" : ""}" style="color:${meta.color}${meta.dash ? "" : ";background:" + meta.color}"></span>`;
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      chip.innerHTML = `${emoji} ${sw} ${rest.join(" ")}`;
+      legend.appendChild(chip);
+    });
+
+    /* ============ 오리지널 SVG 아바타 파츠 (사람 초상 + 드래곤) ============ */
+    // 데이터(DRAGONS/DRAGON_ART/HUMAN_ART)는 상단 데이터 섹션에 선언 (관계도보다 먼저 필요)
+
+    // 색 어둡게 (음영용)
+    function darken(hex, f) {
+      const n = parseInt(hex.slice(1), 16);
+      const r = Math.round(((n >> 16) & 255) * f);
+      const g = Math.round(((n >> 8) & 255) * f);
+      const b = Math.round((n & 255) * f);
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
+    /* ---------- 사람 초상 파츠 ---------- */
+    function hairPart(style, c) {
+      switch (style) {
+        case "messy": return { back: "", front: `<path d="M33 47 C31 21 48 14 60 14 C72 14 89 21 87 47 C83 33 75 28 67 27 L71 17 L61 26 L54 16 L50 28 C43 31 37 37 33 47 Z" fill="${c}"/>` };
+        case "short": return { back: "", front: `<path d="M34 47 C33 24 47 16 60 16 C73 16 87 24 86 47 C80 34 70 30 60 30 C50 30 40 34 34 47 Z" fill="${c}"/>` };
+        case "sideBraid": return {
+          back: `<g fill="${c}"><ellipse cx="31" cy="66" rx="6.5" ry="7.5"/><ellipse cx="29" cy="79" rx="6" ry="7"/><ellipse cx="28" cy="91" rx="5.5" ry="6.5"/><ellipse cx="27" cy="101" rx="4.5" ry="5"/></g>`,
+          front: `<path d="M34 47 C33 22 48 15 60 15 C73 15 88 24 86 47 C80 33 70 29 60 29 C50 29 40 34 34 47 Z" fill="${c}"/>` };
+        case "twinBraids": return {
+          back: `<g fill="${c}"><ellipse cx="30" cy="66" rx="6" ry="7"/><ellipse cx="29" cy="79" rx="5.5" ry="6.5"/><ellipse cx="28" cy="90" rx="5" ry="5.5"/><ellipse cx="90" cy="66" rx="6" ry="7"/><ellipse cx="91" cy="79" rx="5.5" ry="6.5"/><ellipse cx="92" cy="90" rx="5" ry="5.5"/></g>`,
+          front: `<path d="M34 47 C33 23 48 15 60 15 C72 15 87 23 86 47 C80 33 70 29 60 29 C50 29 40 33 34 47 Z" fill="${c}"/>` };
+        case "longLoose": return {
+          back: `<path d="M30 42 C25 70 30 98 35 106 L85 106 C90 98 95 70 90 42 C88 62 80 76 60 76 C40 76 32 62 30 42 Z" fill="${c}"/>`,
+          front: `<path d="M34 46 C33 22 48 15 60 15 C72 15 87 22 86 46 C80 33 70 29 60 29 C50 29 40 33 34 46 Z" fill="${c}"/>` };
+        case "dreads": return {
+          back: `<g fill="${c}"><rect x="26" y="40" width="8" height="62" rx="4"/><rect x="36" y="46" width="7" height="58" rx="3.5"/><rect x="86" y="40" width="8" height="62" rx="4"/><rect x="77" y="46" width="7" height="58" rx="3.5"/></g>`,
+          front: `<path d="M34 46 C33 22 48 14 60 14 C72 14 87 22 86 46 C80 32 70 28 60 28 C50 28 40 32 34 46 Z" fill="${c}"/>` };
+        case "baldTuft": return { back: "", front: `<path d="M50 26 C53 15 67 15 70 26 C64 21 56 21 50 26 Z" fill="${c}"/><path d="M32 50 C30 42 33 38 37 38 C36 44 36 48 37 52 Z" fill="${c}"/><path d="M88 50 C90 42 87 38 83 38 C84 44 84 48 83 52 Z" fill="${c}"/>` };
+        case "sideThin": return { back: "", front: `<path d="M33 52 C31 42 34 36 39 36 C37 44 37 49 39 55 Z" fill="${c}"/><path d="M87 52 C89 42 86 36 81 36 C83 44 83 49 81 55 Z" fill="${c}"/>` };
+        default: return { back: "", front: "" };
+      }
+    }
+
+    function beardPart(type, c) {
+      if (type === "full") return `<path d="M37 56 C39 86 52 102 60 102 C68 102 81 86 83 56 C74 70 66 74 60 74 C54 74 46 70 37 56 Z" fill="${c}"/>`;
+      if (type === "mustache") return `<path d="M47 65 C53 71 67 71 73 65 C68 70 62 70 60 66 C58 70 52 70 47 65 Z" fill="${c}"/>`;
+      return "";
+    }
+
+    function helmetPart(color) {
+      const rim = darken(color, 0.7), horn = "#efe4c6", hornS = "#b8a878";
+      return `
+        <path d="M20 40 C16 30 22 20 30 16 C30 26 34 34 42 40 Z" fill="${horn}" stroke="${hornS}" stroke-width="1"/>
+        <path d="M100 40 C104 30 98 20 90 16 C90 26 86 34 78 40 Z" fill="${horn}" stroke="${hornS}" stroke-width="1"/>
+        <path d="M33 42 C33 20 47 12 60 12 C73 12 87 20 87 42 Z" fill="${color}" stroke="${rim}" stroke-width="1.2"/>
+        <rect x="31" y="39" width="58" height="6" rx="3" fill="${rim}"/>`;
+    }
+
+    function humanInner(id) {
+      const h = HUMAN_ART[id];
+      const skin = h.skin, sk2 = darken(skin, 0.82), cloth = h.cloth, cloth2 = darken(cloth, 0.8);
+      const hc = (h.hair && h.hair.c) || "#3a2a1a";
+      const hair = hairPart((h.hair && h.hair.style) || "none", hc);
+      const browC = darken(hc, 0.7);
+      const brow = h.fierce
+        ? `<path d="M44 42 L54 46" stroke="${browC}" stroke-width="2.5" stroke-linecap="round"/><path d="M76 42 L66 46" stroke="${browC}" stroke-width="2.5" stroke-linecap="round"/>`
+        : `<path d="M45 43 Q50 41 55 43" stroke="${browC}" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M65 43 Q70 41 75 43" stroke="${browC}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+      const mouth = h.beard === "full" ? "" : `<path d="M53 67 Q60 ${h.fierce ? 64 : 72} 67 67" stroke="${darken(skin, 0.6)}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+      const paint = h.paint ? `<path d="M50 40 L48 60" stroke="${h.paint}" stroke-width="3" stroke-linecap="round" opacity="0.8"/><path d="M70 40 L72 60" stroke="${h.paint}" stroke-width="3" stroke-linecap="round" opacity="0.8"/>` : "";
+      const scar = h.scar ? `<path d="M72 38 L78 58" stroke="${h.scar}" stroke-width="1.6" stroke-linecap="round"/>` : "";
+      return `
+        ${hair.back}
+        <path d="M24 120 C26 96 42 86 60 86 C78 86 94 96 96 120 Z" fill="${cloth}"/>
+        <path d="M24 120 C26 104 34 96 40 92 L44 120 Z" fill="${cloth2}" opacity="0.6"/>
+        <rect x="52" y="72" width="16" height="18" rx="7" fill="${sk2}"/>
+        <ellipse cx="60" cy="50" rx="26" ry="29" fill="${skin}"/>
+        <circle cx="34" cy="53" r="5" fill="${skin}"/><circle cx="86" cy="53" r="5" fill="${skin}"/>
+        ${hair.front}
+        ${h.helmet ? helmetPart(h.helmet) : ""}
+        ${paint}${scar}${brow}
+        <ellipse class="dg-eye" cx="50" cy="51" rx="3" ry="4" fill="#241d16"/>
+        <ellipse class="dg-eye" cx="70" cy="51" rx="3" ry="4" fill="#241d16"/>
+        <circle cx="49" cy="49.6" r="1" fill="#fff" opacity="0.85"/><circle cx="69" cy="49.6" r="1" fill="#fff" opacity="0.85"/>
+        <path d="M60 53 L57 61 L63 61 Z" fill="${sk2}"/>
+        ${mouth}
+        ${beardPart(h.beard, h.beardC || hc)}`;
+    }
+
+    /* ---------- 드래곤 파츠 ---------- */
+    // 머리 하나 (중심·반지름 지정 → 단일/쌍둥이 공용)
+    function headGroup(cx, cy, r, p, stroke) {
+      const ex1 = cx - r * 0.37, ex2 = cx + r * 0.37, ey = cy - r * 0.07, er = r * 0.30;
+      const nx1 = cx - r * 0.16, nx2 = cx + r * 0.16, ny = cy + r * 0.4;
+      return `
+        <ellipse cx="${cx}" cy="${cy}" rx="${r}" ry="${r * 0.9}" fill="url(#${p.bId})" stroke="${stroke}" stroke-width="1"/>
+        <ellipse cx="${cx}" cy="${ny}" rx="${r * 0.42}" ry="${r * 0.3}" fill="${p.body[1]}" opacity="0.5"/>
+        <ellipse cx="${nx1}" cy="${ny}" rx="1.4" ry="1.9" fill="#0a0a12"/>
+        <ellipse cx="${nx2}" cy="${ny}" rx="1.4" ry="1.9" fill="#0a0a12"/>
+        <g filter="url(#${p.fId})">
+          <ellipse class="dg-eye" cx="${ex1}" cy="${ey}" rx="${er}" ry="${er * 1.12}" fill="url(#${p.gId})"/>
+          <ellipse class="dg-eye" cx="${ex2}" cy="${ey}" rx="${er}" ry="${er * 1.12}" fill="url(#${p.gId})"/>
+        </g>
+        <ellipse cx="${ex1}" cy="${ey + 1}" rx="${er * 0.38}" ry="${er * 0.66}" fill="#0b1a17"/>
+        <ellipse cx="${ex2}" cy="${ey + 1}" rx="${er * 0.38}" ry="${er * 0.66}" fill="#0b1a17"/>
+        <circle cx="${ex1 - 1.4}" cy="${ey - 2.4}" r="1.4" fill="#fff" opacity="0.9"/>
+        <circle cx="${ex2 - 1.4}" cy="${ey - 2.4}" r="1.4" fill="#fff" opacity="0.9"/>`;
+    }
+
+    // 머리 위 뿔/귀 (단일 머리 기준 좌표)
+    function topper(p, stroke) {
+      const c = p.accent || p.body[1];
+      switch (p.horn) {
+        case "spikes":
+          return `<g fill="${c}" stroke="${stroke}" stroke-width="0.8">
+            <path d="M45 30 L43 13 L53 29 Z"/><path d="M60 28 L60 8 L69 27 Z"/><path d="M75 30 L81 14 L69 29 Z"/></g>`;
+        case "curved":
+          return `<path d="M46 30 C40 16 30 13 25 17 C33 19 40 25 48 35 Z" fill="${c}" stroke="${stroke}" stroke-width="1"/>
+                  <path d="M74 30 C80 16 90 13 95 17 C87 19 80 25 72 35 Z" fill="${c}" stroke="${stroke}" stroke-width="1"/>`;
+        case "stub":
+          return `<ellipse cx="49" cy="28" rx="6.5" ry="5" fill="${p.body[1]}" stroke="${stroke}" stroke-width="1"/>
+                  <ellipse cx="71" cy="28" rx="6.5" ry="5" fill="${p.body[1]}" stroke="${stroke}" stroke-width="1"/>`;
+        default: // ears (나이트 퓨어리 귀날개)
+          return `<path d="M46 30 C37 15 44 10 51 16 C51 25 51 31 54 38 Z" fill="${p.body[1]}" stroke="${stroke}" stroke-width="1"/>
+                  <path d="M74 30 C83 15 76 10 69 16 C69 25 69 31 66 38 Z" fill="${p.body[1]}" stroke="${stroke}" stroke-width="1"/>`;
+      }
+    }
+
+    function dragonSingle(p, stroke) {
+      return `
+        <path d="M40 56 C18 44 8 52 7 66 C20 62 30 64 40 74 Z" fill="${p.body[2]}" stroke="${stroke}" stroke-width="1"/>
+        <path d="M80 56 C102 44 112 52 113 66 C100 62 90 64 80 74 Z" fill="${p.body[2]}" stroke="${stroke}" stroke-width="1"/>
+        ${topper(p, stroke)}
+        ${headGroup(60, 52, 30, p, stroke)}`;
+    }
+
+    // 지플백: 목 둘·머리 둘
+    function dragonTwin(p, stroke) {
+      const spike = (cx) => `<g fill="${p.accent || p.body[1]}" stroke="${stroke}" stroke-width="0.7">
+        <path d="M${cx - 9} 38 L${cx - 11} 27 L${cx - 3} 37 Z"/>
+        <path d="M${cx} 36 L${cx} 24 L${cx + 7} 35 Z"/>
+        <path d="M${cx + 9} 38 L${cx + 13} 28 L${cx + 4} 37 Z"/></g>`;
+      return `
+        <path d="M60 78 C46 74 40 84 40 96 C50 90 56 90 62 96 Z" fill="${p.body[2]}" stroke="${stroke}" stroke-width="1"/>
+        ${spike(38)} ${spike(82)}
+        ${headGroup(38, 58, 20, p, stroke)}
+        ${headGroup(82, 58, 20, p, stroke)}`;
+    }
+
+    function dragonInner(id, uid) {
+      const raw = DRAGON_ART[id];
+      const p = { ...raw, bId: "b" + uid, gId: "g" + uid, fId: "f" + uid };
+      const stroke = raw.dark ? "#9aa0c0" : "#2c2c56";
+      const inner = raw.horn === "twin" ? dragonTwin(p, stroke) : dragonSingle(p, stroke);
+      return `
+        <defs>
+          <radialGradient id="${p.bId}" cx="50%" cy="34%" r="72%">
+            <stop offset="0%" stop-color="${p.body[0]}"/><stop offset="58%" stop-color="${p.body[1]}"/><stop offset="100%" stop-color="${p.body[2]}"/>
+          </radialGradient>
+          <radialGradient id="${p.gId}" cx="50%" cy="38%" r="62%">
+            <stop offset="0%" stop-color="${p.eye[0]}"/><stop offset="48%" stop-color="${p.eye[1]}"/><stop offset="100%" stop-color="${p.eye[2]}"/>
+          </radialGradient>
+          <filter id="${p.fId}" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="1.6" result="bl"/><feMerge><feMergeNode in="bl"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        ${inner}`;
+    }
+
+    // 통합 아바타: 드래곤이면 드래곤, 아니면 사람 초상 (uid로 gradient id 충돌 방지)
+    function avatarInner(id, uid) {
+      uid = uid || id;
+      return DRAGONS.has(id) ? dragonInner(id, uid) : humanInner(id);
+    }
+
+    /* ===================== 인물 카드 렌더 ===================== */
+    const FAV_KEY = "dragons.favorites.v1";
+    const favSet = new Set(loadFav());
+
+    function loadFav() {
+      try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; }
+      catch { return []; }
+    }
+    function saveFav() { localStorage.setItem(FAV_KEY, JSON.stringify([...favSet])); }
+    function updateFavCount() { document.getElementById("favN").textContent = favSet.size; }
+
+    const cardsRoot = document.getElementById("cards");
+
+    GROUPS.forEach((grp) => {
+      const members = CHARACTERS.filter((c) => c.group === grp.key);
+
+      const head = document.createElement("div");
+      head.className = "section-head";
+      head.innerHTML = `<h2>${grp.label}</h2><span>${grp.sub} · ${members.length}명</span>`;
+      cardsRoot.appendChild(head);
+
+      const grid = document.createElement("div");
+      grid.className = "grid";
+
+      members.forEach((c) => {
+        const card = document.createElement("article");
+        card.className = "card";
+        card.dataset.id = c.id;
+
+        const on = favSet.has(c.id);
+        card.innerHTML = `
+          <button class="fav ${on ? "on" : ""}" aria-label="최애 토글" title="최애로 저장">${on ? "❤️" : "♡"}</button>
+          <div class="card-head">
+            <div class="c-avatar"><svg viewBox="0 0 120 120" class="avatar-svg" aria-hidden="true">${avatarInner(c.id, c.id + "_c")}</svg></div>
+            <div>
+              <div class="c-name">${c.name}</div>
+              <div class="c-role">${c.role}</div>
+            </div>
+          </div>
+          <div class="c-dragon">${c.dragon}</div>
+          <div class="c-tags">${c.tags.map((t) => `<span>#${t}</span>`).join("")}</div>
+          <div class="c-desc">${c.desc}</div>
+          <div class="c-more">자세히 <span class="arw">▾</span></div>`;
+
+        // 카드 클릭 → 펼치기
+        card.addEventListener("click", () => card.classList.toggle("open"));
+
+        // 하트 클릭 → 최애 저장 (펼치기와 분리)
+        const favBtn = card.querySelector(".fav");
+        favBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (favSet.has(c.id)) { favSet.delete(c.id); favBtn.classList.remove("on"); favBtn.textContent = "♡"; }
+          else { favSet.add(c.id); favBtn.classList.add("on"); favBtn.textContent = "❤️"; }
+          saveFav(); updateFavCount();
+        });
+
+        grid.appendChild(card);
+      });
+
+      cardsRoot.appendChild(grid);
+    });
+
+    updateFavCount();
+  </script>
+</body>
+</html>
